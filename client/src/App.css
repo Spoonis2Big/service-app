@@ -746,14 +746,14 @@ body {
   margin-top: 0.5rem;
 }
 
-.order-date, .order-phone {
+.order-date, .order-phone, .order-pictures {
   display: flex;
   align-items: center;
   font-size: 0.875rem;
   color: #6b7280;
 }
 
-.order-date svg {
+.order-date svg, .order-pictures svg {
   margin-right: 0.25rem;
 }
 
@@ -862,6 +862,153 @@ body {
   border-top: 1px solid #e5e7eb;
 }
 
+/* Picture Upload Styles */
+.picture-upload-section {
+  border: 2px dashed #d1d5db;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  background-color: #f9fafb;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.picture-upload-section:hover {
+  border-color: #3b82f6;
+  background-color: #f0f9ff;
+}
+
+.picture-previews, .existing-pictures {
+  margin-top: 1rem;
+}
+
+.picture-previews h4, .picture-previews h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+.preview-grid, .pictures-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.preview-item, .picture-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.preview-item img, .picture-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.2s;
+}
+
+.remove-btn:hover {
+  background: rgba(239, 68, 68, 1);
+}
+
+.pictures-section {
+  margin: 1.5rem 0;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1.5rem;
+}
+
+.pictures-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.pictures-header h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.picture-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.no-pictures {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.5rem;
+  background-color: #f9fafb;
+}
+
+.no-pictures svg {
+  margin-bottom: 0.75rem;
+  color: #d1d5db;
+}
+
+.no-pictures p {
+  font-size: 0.975rem;
+}
+
+/* Picture upload animations */
+.picture-upload-section.drag-over {
+  border-color: #3b82f6;
+  background-color: #dbeafe;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.preview-item, .picture-item {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Loading states for pictures */
+.picture-item.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Responsive Design */
 @media (min-width: 769px) {
   .sidebar {
@@ -911,5 +1058,86 @@ body {
   .search-container {
     max-width: none;
     margin-bottom: 1rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tab-navigation {
+    flex-direction: column;
+  }
+  
+  .tab {
+    justify-content: flex-start;
+  }
+  
+  .order-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .order-delivery-info {
+    margin-top: 1rem;
+    min-width: auto;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .delivery-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .details-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .pictures-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .picture-actions {
+    justify-content: center;
+  }
+  
+  .preview-grid, .pictures-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 0.5rem;
+  }
+  
+  .dashboard-header h2, .delivery-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .metric-value {
+    font-size: 1.5rem;
+  }
+  
+  .order-card, .tab-content {
+    padding: 1rem;
+  }
+  
+  .modal {
+    margin: 0.5rem;
+    max-width: none;
+  }
+  
+  .preview-grid, .pictures-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
