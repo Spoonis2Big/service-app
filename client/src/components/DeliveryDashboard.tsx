@@ -16,6 +16,8 @@ const DeliveryDashboard: React.FC = () => {
     phone_number: '',
     product: '',
     issues: '',
+    serial_number: '',
+    acknowledgment: '',
     date: new Date().toISOString().split('T')[0]
   });
   
@@ -67,6 +69,8 @@ const DeliveryDashboard: React.FC = () => {
         phone_number: '',
         product: '',
         issues: '',
+        serial_number: '',
+        acknowledgment: '',
         date: new Date().toISOString().split('T')[0]
       });
       
@@ -243,6 +247,26 @@ const DeliveryDashboard: React.FC = () => {
                     value={newOrderData.date}
                     onChange={(e) => setNewOrderData({...newOrderData, date: e.target.value})}
                     required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Serial Number (SN)</label>
+                  <input
+                    type="text"
+                    value={newOrderData.serial_number}
+                    onChange={(e) => setNewOrderData({...newOrderData, serial_number: e.target.value})}
+                    placeholder="Enter serial number"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Acknowledgment (ACK)</label>
+                  <input
+                    type="text"
+                    value={newOrderData.acknowledgment}
+                    onChange={(e) => setNewOrderData({...newOrderData, acknowledgment: e.target.value})}
+                    placeholder="Enter acknowledgment"
                   />
                 </div>
               </div>
@@ -436,6 +460,14 @@ const DeliveryDashboard: React.FC = () => {
                 <span className={`status ${getStatusColor(selectedOrder.status)}`}>
                   {selectedOrder.status?.replace('_', ' ')}
                 </span>
+              </div>
+              <div className="detail-item">
+                <label>Serial Number</label>
+                <span>{selectedOrder.serial_number || 'N/A'}</span>
+              </div>
+              <div className="detail-item">
+                <label>Acknowledgment</label>
+                <span>{selectedOrder.acknowledgment || 'N/A'}</span>
               </div>
             </div>
             

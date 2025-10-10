@@ -1,0 +1,21 @@
+[Unit]
+Description=Service App Backend
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=matt
+Group=matt
+WorkingDirectory=/home/matt/service-app
+Environment=NODE_ENV=production
+Environment=PORT=3001
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=service-app-backend
+
+[Install]
+WantedBy=multi-user.target

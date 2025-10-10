@@ -70,8 +70,9 @@ class Database {
       INSERT INTO service_orders (
         service_order_number, date, customer_name, phone_number, product,
         issues, notes, pictures, piece_picked_date, piece_return_date,
-        parts_ordered, part_order_date, part_arrival_date, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        parts_ordered, part_order_date, part_arrival_date, serial_number,
+        acknowledgment, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const values = [
@@ -88,6 +89,8 @@ class Database {
       JSON.stringify(orderData.parts_ordered || []),
       orderData.part_order_date,
       orderData.part_arrival_date,
+      orderData.serial_number,
+      orderData.acknowledgment,
       orderData.status || 'open'
     ];
 
@@ -101,7 +104,8 @@ class Database {
         service_order_number = ?, date = ?, customer_name = ?, phone_number = ?,
         product = ?, issues = ?, notes = ?, pictures = ?, piece_picked_date = ?,
         piece_return_date = ?, parts_ordered = ?, part_order_date = ?,
-        part_arrival_date = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+        part_arrival_date = ?, serial_number = ?, acknowledgment = ?, status = ?, 
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     
@@ -119,6 +123,8 @@ class Database {
       JSON.stringify(orderData.parts_ordered || []),
       orderData.part_order_date,
       orderData.part_arrival_date,
+      orderData.serial_number,
+      orderData.acknowledgment,
       orderData.status,
       id
     ];

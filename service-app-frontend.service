@@ -1,0 +1,21 @@
+[Unit]
+Description=Service App Frontend
+After=network.target service-app-backend.service
+Wants=network.target
+Requires=service-app-backend.service
+
+[Service]
+Type=simple
+User=matt
+Group=matt
+WorkingDirectory=/home/matt/service-app/client
+Environment=NODE_ENV=production
+ExecStart=/usr/local/bin/serve -s build -p 3000 -C
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=service-app-frontend
+
+[Install]
+WantedBy=multi-user.target

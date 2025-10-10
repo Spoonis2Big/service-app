@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// Use the current host's IP/hostname for the API URL
-const API_BASE_URL = `http://${window.location.hostname}:3001/api`;
+const API_BASE_URL = 'http://localhost:3001/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -23,8 +22,6 @@ export interface ServiceOrder {
   parts_ordered?: string[];
   part_order_date?: string;
   part_arrival_date?: string;
-  serial_number?: string;
-  acknowledgment?: string;
   status?: 'open' | 'in_progress' | 'completed' | 'closed';
   created_at?: string;
   updated_at?: string;

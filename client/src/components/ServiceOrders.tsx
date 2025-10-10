@@ -72,7 +72,9 @@ const ServiceOrders: React.FC = () => {
   const filteredOrders = orders.filter(order =>
     order.service_order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.product?.toLowerCase().includes(searchTerm.toLowerCase())
+    order.product?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.serial_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.acknowledgment?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status?: string) => {
@@ -141,6 +143,20 @@ const ServiceOrders: React.FC = () => {
                   <Camera size={16} />
                   {order.pictures.length} photo(s)
                 </p>
+              )}
+              {(order.serial_number || order.acknowledgment) && (
+                <div className="order-sn-ack">
+                  {order.serial_number && (
+                    <p className="order-sn">
+                      <span className="field-label">SN:</span> {order.serial_number}
+                    </p>
+                  )}
+                  {order.acknowledgment && (
+                    <p className="order-ack">
+                      <span className="field-label">ACK:</span> {order.acknowledgment}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
 
@@ -246,6 +262,26 @@ const ServiceOrders: React.FC = () => {
                     <option value="completed">Completed</option>
                     <option value="closed">Closed</option>
                   </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Serial Number (SN)</label>
+                  <input
+                    type="text"
+                    value={formData.serial_number || ''}
+                    onChange={(e) => setFormData({...formData, serial_number: e.target.value})}
+                    placeholder="Enter serial number"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Acknowledgment (ACK)</label>
+                  <input
+                    type="text"
+                    value={formData.acknowledgment || ''}
+                    onChange={(e) => setFormData({...formData, acknowledgment: e.target.value})}
+                    placeholder="Enter acknowledgment"
+                  />
                 </div>
               </div>
 
