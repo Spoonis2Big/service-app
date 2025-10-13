@@ -37,11 +37,66 @@ class Database {
       )
     `;
 
+    const createUsersTable = `
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT DEFAULT 'user', -- user, admin
+        active INTEGER DEFAULT 1, -- 1 = active, 0 = inactive
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
     this.db.run(createServiceOrdersTable, (err) => {
       if (err) {
         console.error('Error creating service_orders table:', err);
       } else {
         console.log('Service orders table created or already exists');
+      }
+    });
+
+    this.db.run(createUsersTable, (err) => {
+      if (err) {
+        console.error('Error creating users table:', err);
+      } else {
+        console.log('Users table created or already exists');
+        this.createDefaultAdmin();
+      }
+    });
+  }
+
+  // Create default admin user if none exists
+  createDefaultAdmin() {
+    const bcrypt = require('bcryptjs');
+    const checkAdminSql = 'SELECT * FROM users WHERE role = ?';
+
+    this.db.get(checkAdminSql, ['admin'], (err, row) => {
+      if (err) {
+        console.error('Error checking for admin user:', err);
+        return;
+      }
+
+      if (!row) {
+        // No admin exists, create default admin
+        const defaultPassword = 'admin123'; // User should change this immediately
+        const hashedPassword = bcrypt.hashSync(defaultPassword, 10);
+
+        const insertAdminSql = `
+          INSERT INTO users (username, email, password, role)
+          VALUES (?, ?, ?, ?)
+        `;
+
+        this.db.run(insertAdminSql, ['admin', 'admin@serviceapp.com', hashedPassword, 'admin'], (insertErr) => {
+          if (insertErr) {
+            console.error('Error creating default admin:', insertErr);
+          } else {
+            console.log('Default admin user created (username: admin, password: admin123)');
+            console.log('IMPORTANT: Please change the default admin password immediately!');
+          }
+        });
       }
     });
   }
@@ -178,6 +233,85 @@ class Database {
       AND piece_picked_date != ''
     `;
     this.db.get(sql, [], callback);
+  }
+
+  // User Management Methods
+
+  // Get all users
+  getAllUsers(callback) {
+    const sql = 'SELECT id, username, email, role, active, created_at FROM users ORDER BY created_at DESC';
+    this.db.all(sql, [], callback);
+  }
+
+  // Get user by ID
+  getUserById(id, callback) {
+    const sql = 'SELECT id, username, email, role, active, created_at FROM users WHERE id = ?';
+    this.db.get(sql, [id], callback);
+  }
+
+  // Get user by username (for login)
+  getUserByUsername(username, callback) {
+    const sql = 'SELECT * FROM users WHERE username = ?';
+    this.db.get(sql, [username], callback);
+  }
+
+  // Get user by email
+  getUserByEmail(email, callback) {
+    const sql = 'SELECT * FROM users WHERE email = ?';
+    this.db.get(sql, [email], callback);
+  }
+
+  // Create new user
+  createUser(userData, callback) {
+    const sql = `
+      INSERT INTO users (username, email, password, role, active)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      userData.username,
+      userData.email,
+      userData.password, // Should be hashed before calling this
+      userData.role || 'user',
+      userData.active !== undefined ? userData.active : 1
+    ];
+
+    this.db.run(sql, values, callback);
+  }
+
+  // Update user
+  updateUser(id, userData, callback) {
+    const sql = `
+      UPDATE users SET
+        username = ?, email = ?, role = ?, active = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const values = [
+      userData.username,
+      userData.email,
+      userData.role,
+      userData.active,
+      id
+    ];
+
+    this.db.run(sql, values, callback);
+  }
+
+  // Update user password
+  updateUserPassword(id, hashedPassword, callback) {
+    const sql = `
+      UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    this.db.run(sql, [hashedPassword, id], callback);
+  }
+
+  // Delete user
+  deleteUser(id, callback) {
+    const sql = 'DELETE FROM users WHERE id = ?';
+    this.db.run(sql, [id], callback);
   }
 
   close() {

@@ -5,6 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const Database = require('./database');
 const dashboardRoutes = require('./dashboard');
+const { authenticateToken, requireAdmin, loginRoute, getCurrentUserRoute, changePasswordRoute } = require('./auth');
+const usersRoutes = require('./users');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -52,18 +54,28 @@ const upload = multer({
 // Serve uploaded files statically
 app.use('/uploads', express.static(uploadsDir));
 
-// Use dashboard routes
-app.use('/api/dashboard', dashboardRoutes);
-
-// Routes
+// Public routes (no authentication required)
+app.post('/api/auth/login', loginRoute(db));
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Service App API is running' });
 });
 
+// Protected routes (authentication required)
+app.use('/api/auth/me', authenticateToken, getCurrentUserRoute(db));
+app.post('/api/auth/change-password', authenticateToken, changePasswordRoute(db));
+
+// Use dashboard routes (protected)
+app.use('/api/dashboard', authenticateToken, dashboardRoutes);
+
+// User management routes (admin only)
+app.use('/api/users', authenticateToken, requireAdmin, usersRoutes(db));
+
+// Service Orders Routes (protected)
+
 // Get all service orders
-app.get('/api/service-orders', (req, res) => {
+app.get('/api/service-orders', authenticateToken, (req, res) => {
   db.getAllServiceOrders((err, rows) => {
     if (err) {
       console.error('Error fetching service orders:', err);
@@ -81,7 +93,7 @@ app.get('/api/service-orders', (req, res) => {
 });
 
 // Get service order by ID
-app.get('/api/service-orders/:id', (req, res) => {
+app.get('/api/service-orders/:id', authenticateToken, (req, res) => {
   const id = req.params.id;
   db.getServiceOrderById(id, (err, row) => {
     if (err) {
@@ -102,7 +114,7 @@ app.get('/api/service-orders/:id', (req, res) => {
 });
 
 // Get service order by service order number
-app.get('/api/service-orders/number/:orderNumber', (req, res) => {
+app.get('/api/service-orders/number/:orderNumber', authenticateToken, (req, res) => {
   const orderNumber = req.params.orderNumber;
   db.getServiceOrderByNumber(orderNumber, (err, row) => {
     if (err) {
@@ -123,7 +135,7 @@ app.get('/api/service-orders/number/:orderNumber', (req, res) => {
 });
 
 // Create new service order
-app.post('/api/service-orders', (req, res) => {
+app.post('/api/service-orders', authenticateToken, (req, res) => {
   const orderData = req.body;
   
   // Generate service order number if not provided
@@ -151,7 +163,7 @@ app.post('/api/service-orders', (req, res) => {
 });
 
 // Update service order
-app.put('/api/service-orders/:id', (req, res) => {
+app.put('/api/service-orders/:id', authenticateToken, (req, res) => {
   const id = req.params.id;
   const orderData = req.body;
 
@@ -168,7 +180,7 @@ app.put('/api/service-orders/:id', (req, res) => {
 });
 
 // Delete service order
-app.delete('/api/service-orders/:id', (req, res) => {
+app.delete('/api/service-orders/:id', authenticateToken, (req, res) => {
   const id = req.params.id;
 
   db.deleteServiceOrder(id, function(err) {
@@ -184,7 +196,7 @@ app.delete('/api/service-orders/:id', (req, res) => {
 });
 
 // Upload pictures for service order
-app.post('/api/service-orders/:id/upload', upload.array('pictures', 10), (req, res) => {
+app.post('/api/service-orders/:id/upload', authenticateToken, upload.array('pictures', 10), (req, res) => {
   const id = req.params.id;
   
   if (!req.files || req.files.length === 0) {
